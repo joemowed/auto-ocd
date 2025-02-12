@@ -71,3 +71,4 @@ if __name__ == "__main__":
         reset_color = "\033[0m"
 
         print(f"{green_text}auto-ocd Successfully Installed{reset_color}")
+        print("git update test")
