@@ -13,8 +13,9 @@ def rmDir(path):
         pass
 
 def clrDir(path):
-    rmDir(path)
-    os.makedirs(path)
+    if os.path.exists(path):
+        shutil.rmtree(path)  
+    os.makedirs(path)  
 
 if __name__ == "__main__": 
     parser = argparse.ArgumentParser()
