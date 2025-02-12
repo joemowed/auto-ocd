@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import os
+from posix import system
 import sys
 import shutil
 installDir = "/usr/share/auto-ocd"
@@ -21,24 +22,33 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--init", action="store_true",
                     help="Initialize a new auto-ocd project.  Use with no other arguments.")
     parser.add_argument("-u","--upload",action="store_true",help="Uploads program and verifies upload using openocd script located at auto-ocd/openocd.cfg.  Resets and halts processor upon completion of upload.  Does not build program before uploading when used without \"--build\" option")
-    parser.add_argument("-b","--build",action="store_true",help="Builds program. Defaults to debug build.")
 
+    parser.add_argument("-b","--build",action="store_true",help="Builds program. Defaults to debug build.")
     parser.add_argument("-g","--gdb",action="store_true",help="Creates openocd instance and calls gdb-multiarch on project executable.")
     parser.add_argument("--update",action="store_true",help=" Requires sudo.  Downloads newest version from github and adds \"auto-ocd.py\" to \"/usr/bin\" and copies nessasarry files to \"/usr/share/auto-ocd/*\". Overwrites existing open-ocd installation")
     parser.add_argument("--update-local",action="store_true",help="Same as \"--update\", but uses the local src files instead of cloning from github.  Useful for development.")
+    parser.add_argument("-d","--dev",action="store_true",help="Uses local src files instead of the ones installed at \"/usr/share\".  Useful for development. Note: Installs auto-ocd as if \"--update-local\" was called.")
     args = parser.parse_args()
     print(args)
+    cwd = os.path.dirname(__file__)
+    if args.dev:
+        sys.path.append(cwd)
+        from main import AutoOCD
+        args.update_local = True
+    else:
+        sys.path.append("/usr/share/auto-ocd")
+        from main import AutoOCD
     if(args.update or args.update_local):
         if not os.getenv("SUDO_USER"):
             print("Installation requries sudo privileges.")
             sys.exit()
         if args.update_local:
-            cwd = os.path.dirname(__file__)
             if -1 == cwd.find("auto-ocd/src"):
                 print("Error:  Cannot run \"--update-local\" from the installed version of auto-ocd.  To update, try \"--update\" instead.")
                 sys.exit()
             rmDir(tmpDir)
             shutil.copytree(cwd,f"{tmpDir}/src")
+            rmDir("/tmp/auto-ocd/__pycache__")
 
         else:   
             print("Downloading latest version...")
@@ -71,4 +81,4 @@ if __name__ == "__main__":
         reset_color = "\033[0m"
 
         print(f"{green_text}auto-ocd Successfully Installed{reset_color}")
-        print("git update test")
+    AutoOCD()
