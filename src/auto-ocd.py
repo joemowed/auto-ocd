@@ -2,7 +2,6 @@
 import argparse
 import glob
 import os
-from posix import system
 import sys
 import shutil
 installDir = "/usr/share/auto-ocd"

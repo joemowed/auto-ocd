@@ -4,7 +4,6 @@ import shutil
 from searchStr import SearchStr
 import sys
 class AutoOCD:
-<<<<<<< HEAD
     installDir = ""
     cwd = ""
     gdbPort = 1234
@@ -46,6 +45,15 @@ class AutoOCD:
         endStr = "${SOURCES}"
         newStr = f'''{startStr}\n{oldStr}\n{endStr}'''
         fileStringReplace(cmakePath,oldStr,newStr)
+
+        mainCPath =f'''{cubeMXPath}/Core/Src/main.c'''
+        oldStr = SearchStr.mainUserHeaders
+        newStr = f'''{SearchStr.mainUserHeaders}\n#include "{projectName}.hpp"'''
+        fileStringReplace(mainCPath,oldStr,newStr)
+        oldStr = SearchStr.mainUserCodeLoop
+        newStr = f'''{SearchStr.mainUserCodeLoop}\n{projectName}();\n'''
+        fileStringReplace(mainCPath,oldStr,newStr)
+
         self.copyDefaultFiles(projectName)
 
 
@@ -80,7 +88,6 @@ class AutoOCD:
         self.mainHeaderPath = tmpHeaderPath
 
 
-        
         
         
 def copyNewPermissions(srcPath,newPath):
