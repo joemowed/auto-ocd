@@ -4,6 +4,7 @@ import shutil
 from searchStr import SearchStr
 import sys
 class AutoOCD:
+<<<<<<< HEAD
     installDir = ""
     cwd = ""
     gdbPort = 1234
