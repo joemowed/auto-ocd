@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import glob
 import os
 from posix import system
 import sys
@@ -17,7 +18,7 @@ def clrDir(path):
     rmDir(path)
     os.makedirs(path)
 
-if __name__ == "__main__": 
+if __name__ == "__main__":  
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--init", action="store_true",
                     help="Initialize a new auto-ocd project.  Use with no other arguments.")
@@ -29,23 +30,19 @@ if __name__ == "__main__":
     parser.add_argument("--update-local",action="store_true",help="Same as \"--update\", but uses the local src files instead of cloning from github.  Useful for development.")
     parser.add_argument("-d","--dev",action="store_true",help="Uses local src files instead of the ones installed at \"/usr/share\".  Useful for development. Note: Installs auto-ocd as if \"--update-local\" was called.")
     args = parser.parse_args()
-    print(args)
     cwd = os.path.dirname(__file__)
     if args.dev:
-        sys.path.append(cwd)
-        from main import AutoOCD
         args.update_local = True
-    else:
-        sys.path.append("/usr/share/auto-ocd")
-        from main import AutoOCD
     if(args.update or args.update_local):
         if not os.getenv("SUDO_USER"):
             print("Installation requries sudo privileges.")
             sys.exit()
         if args.update_local:
+            print(cwd)
             if -1 == cwd.find("auto-ocd/src"):
-                print("Error:  Cannot run \"--update-local\" from the installed version of auto-ocd.  To update, try \"--update\" instead.")
-                sys.exit()
+                if -1 == cwd.find("auto-ocd/test"):
+                    print("Error:  Cannot run \"--update-local\" from the installed version of auto-ocd.  To update, try \"--update\" instead.")
+                    sys.exit()
             rmDir(tmpDir)
             shutil.copytree(cwd,f"{tmpDir}/src")
             rmDir("/tmp/auto-ocd/__pycache__")
@@ -81,4 +78,35 @@ if __name__ == "__main__":
         reset_color = "\033[0m"
 
         print(f"{green_text}auto-ocd Successfully Installed{reset_color}")
-    AutoOCD()
+        #drop root privlages
+        callerUID = int(os.getenv("SUDO_UID"))
+
+        os.setuid(callerUID)
+    if args.dev:
+        sys.path.append(cwd)
+        from main import AutoOCD
+        newCWD = os.getcwd()
+        if not newCWD.find("auto-ocd/test"):
+            print("local directories not valid for development, aborting")
+            sys.exit()
+        files = glob.glob(f'{newCWD}/**/**',recursive=True)
+        for file in files:
+            if os.path.isfile(file):
+                os.remove(file)
+                files.remove(file)
+        files = glob.glob(f'{newCWD}/**/**',recursive=True)
+        for dir in files:
+            if dir.endswith('test'):
+                continue
+            try:
+            
+                shutil.rmtree(dir)
+            except FileNotFoundError:
+                pass
+        shutil.copytree(f"../testSource",newCWD)
+        os.chdir(newCWD)
+    else:
+        sys.path.append("/usr/share/auto-ocd")
+        from main import AutoOCD
+    AutoOCD(args,installDir)
+
