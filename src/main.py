@@ -1,8 +1,10 @@
 import os
+
 from shutil import copy
 import shutil
 from searchStr import SearchStr
 import sys
+from openocd import Openocd
 class AutoOCD:
     installDir = ""
     cwd = ""
@@ -15,9 +17,24 @@ class AutoOCD:
     def __init__(self,args,installDir) -> None:
         self.installDir = installDir
         self.cwd = os.getcwd()
+        if args.build:
+            self.build()
         if args.init:
-            print("in main")
             self.init()
+        if args.upload:
+            self.upload()
+    def build(self):
+        os.system("mkdir -p build")
+        os.system("cd ./build")
+        os.system("cmake -B./build ./CubeMX")
+        os.system("ln -s cmake/compile_commands.json ../ > /dev/null 2>&1")
+        os.system("cd build && make")
+    def upload(self):
+        self.openocd = Openocd()
+        while True:
+            tmp = input("press enter to build and upload")
+            self.build()
+            self.openocd.upload()
     def init(self):
         ans = input(f"You are about to initalize a new auto-ocd project in the directory \"{self.cwd}\". This will overwrite existing files.  Are you sure? (y or n) ")
         if not ans == "y":
@@ -56,7 +73,7 @@ class AutoOCD:
 
         self.copyDefaultFiles(projectName)
 
-
+    
     def copyDefaultFiles(self,projectName):
         os.makedirs("./src")
         os.makedirs("./src/includes")
