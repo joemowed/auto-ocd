@@ -16,6 +16,7 @@ class AutoOCD:
     interruptsPath = ""
     openOCDPath = ""
     def __init__(self,args,installDir) -> None:
+        self.args = args
         self.installDir = installDir
         self.cwd = os.getcwd()
         if args.build:
@@ -34,7 +35,9 @@ class AutoOCD:
             for i in range(5):
                 red_text = '\033[31m' + '--------BUILD ERROR------' + '\033[0m'
                 print(red_text)
-            time.sleep(2)
+                sys.exit(1)
+            if(self.args.build):
+                sys.exit(0)
     def upload(self):
         self.openocd = Openocd()
         while True:
