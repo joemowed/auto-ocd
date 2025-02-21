@@ -6,9 +6,11 @@ class Openocd:
     tn:telnetlib.Telnet
     upld:str
     verify:str
+    resetHalt:str
     def __init__(self) -> None:
         self.verify = "flash verify_image ./build/CubeMX.elf 0 elf"
         self.upld = "flash write_image erase unlock ./build/CubeMX.elf 0 elf"
+        self.resetHalt = "reset halt"
         self.createOpenocd()
     def createOpenocd(self):
 
@@ -20,6 +22,8 @@ class Openocd:
         command = f'''echo "{command}" | nc localhost 1235 -w1'''
         os.system(command)
     def upload(self):
+        self.sendNC(self.resetHalt)
         self.sendNC(self.upld)
         self.sendNC(self.verify)
+
 
