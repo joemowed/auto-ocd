@@ -28,7 +28,8 @@ class AutoOCD:
         os.system("cd ./build")
         os.system("cmake -B./build ./CubeMX")
         os.system("ln -s cmake/compile_commands.json ../ > /dev/null 2>&1")
-        os.system("cd build && make")
+        ret = os.system("cd build && make")
+        print(ret)
     def upload(self):
         self.openocd = Openocd()
         while True:
