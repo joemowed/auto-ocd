@@ -5,6 +5,7 @@ import shutil
 from searchStr import SearchStr
 import sys
 from openocd import Openocd
+import time
 class AutoOCD:
     installDir = ""
     cwd = ""
@@ -29,7 +30,11 @@ class AutoOCD:
         os.system("cmake -B./build ./CubeMX")
         os.system("ln -s cmake/compile_commands.json ../ > /dev/null 2>&1")
         ret = os.system("cd build && make")
-        print(ret)
+        if ret != 0:
+            for i in range(5):
+                red_text = '\033[31m' + '--------BUILD ERROR------' + '\033[0m'
+                print(red_text)
+            time.sleep(2)
     def upload(self):
         self.openocd = Openocd()
         while True:
