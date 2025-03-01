@@ -29,9 +29,9 @@ class AutoOCD:
         os.system("mkdir -p build")
         os.system("cd ./build")
         if(self.args.release):
-            os.system("cmake -DCMAKE_BUILD_TYPE=Release -B./build ./CubeMX")
+            os.system("cmake -DCMAKE_BUILD_TYPE=Release -B./build ./device")
         else:
-            os.system("cmake -B./build ./CubeMX")
+            os.system("cmake -B./build ./device")
         os.system("ln -s cmake/compile_commands.json ../ > /dev/null 2>&1")
         ret = os.system("cd build && make")
         if ret != 0:
