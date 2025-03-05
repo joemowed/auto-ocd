@@ -24,7 +24,6 @@ if __name__ == "__main__":
     parser.add_argument("-u","--upload",action="store_true",help="Uploads program and verifies upload using openocd script located at auto-ocd/openocd.cfg.  Resets and halts processor upon completion of upload.  Does not build program before uploading when used without \"--build\" option")
 
     parser.add_argument("-b","--build",action="store_true",help="Builds program. Defaults to debug build.")
-    parser.add_argument("-r","--release",action="store_true",help="Used with \"-b\", builds the program in release mode")
     parser.add_argument("-g","--gdb",action="store_true",help="Creates openocd instance and calls gdb-multiarch on project executable.")
     parser.add_argument("--update",action="store_true",help=" Requires sudo.  Downloads newest version from github and adds \"auto-ocd.py\" to \"/usr/bin\" and copies nessasarry files to \"/usr/share/auto-ocd/*\". Overwrites existing open-ocd installation")
     parser.add_argument("--update-local",action="store_true",help="Same as \"--update\", but uses the local src files instead of cloning from github.  Useful for development.")
